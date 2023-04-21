@@ -251,26 +251,46 @@ lvim.builtin.dap.on_config_done = function(dap)
   }
 
   dap.configurations.cpp = {
-    {
-      name = "Debug C++ Program",
-      type = "cppdbg",
-      request = "launch",
-      MIMode = "gdb",
-      program = "/home/suryap/onnxruntime/build_debug/Debug/onnxruntime_perf_test",
-      cwd = "${workspaceFolder}",
-      args = {"-e", "openvino", "-i", "device_type|CPU_FP32 enable_dynamic_shapes|True", "/home/suryap/whisper/models/decoder/decoder_model.onnx", "-r", "50"},
-      -- env = {"LD_LIBRARY_PATH"="/home/suryap/onnxruntime/build_debug/Debug/"},
-      stopOnEntry = false,
-      MIDebuggerPath = "gdb",
-      setupCommands= {
-				{
-					description= "Enable pretty-printing for gdb",
-					text= "-enable-pretty-printing",
-					ignoreFailures= true,
-				}
-      },
+  --   {
+  --     name = "Debug C++ Program",
+  --     type = "cppdbg",
+  --     request = "launch",
+  --     MIMode = "gdb",
+  --     program = "/home/suryap/onnxruntime/build_debug/Debug/onnxruntime_perf_test",
+  --     cwd = "${workspaceFolder}",
+  --     args = {"-e", "openvino", "-i", "device_type|CPU_FP32 enable_dynamic_shapes|True", "/home/suryap/whisper/whisper-onnx/whisper-model.onnx", "-r", "10"},
+  --     -- env = {"LD_LIBRARY_PATH"="/home/suryap/onnxruntime/build_debug/Debug/"},
+  --     stopOnEntry = false,
+  --     MIDebuggerPath = "gdb",
+  --     setupCommands= {
+		-- 		{
+		-- 			description= "Enable pretty-printing for gdb",
+		-- 			text= "-enable-pretty-printing",
+		-- 			ignoreFailures= true,
+		-- 		}
+  --     },
+  --   },
+  -- },
+  {
+    name = "Debug Python C++ Program",
+    type = "cppdbg",
+    request = "launch",
+    MIMode = "gdb",
+    program = "/home/suryap/whisper/venv-whisper/bin/python3",
+    cwd = "${workspaceFolder}",
+    args = {"/home/suryap/whisper/whisper-onnx/whisper-ort-inference.py", "--input", "/home/suryap/whisper/whisper-onnx/test.wav", "--model", "/home/suryap/whisper/whisper-onnx/whisper-model.onnx"},
+    -- env = {"LD_LIBRARY_PATH"="/home/suryap/onnxruntime/build_debug/Debug/"},
+    stopOnEntry = false,
+    MIDebuggerPath = "gdb",
+    setupCommands= {
+      {
+        description= "Enable pretty-printing for gdb",
+        text= "-enable-pretty-printing",
+        ignoreFailures= true,
+      }
     },
-  }
+  },
+}
   dap.configurations.c = dap.configurations.cpp
 end
 
