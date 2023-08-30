@@ -198,6 +198,20 @@ lvim.plugins = {
       end
     },
     "mfussenegger/nvim-dap-python",
+    {
+      "princejoogie/dir-telescope.nvim",
+      -- telescope.nvim is a required dependency
+      requires = {"nvim-telescope/telescope.nvim"},
+      config = function()
+        require("dir-telescope").setup({
+
+          -- these are the default options set
+          hidden = true,
+          no_ignore = false,
+          show_preview = true,
+        })
+      end,
+    }
 }
 
 -- Autocommands (https://neovim.io/doc/user/autocmd.html)
@@ -276,12 +290,13 @@ lvim.builtin.dap.on_config_done = function(dap)
     type = "cppdbg",
     request = "launch",
     MIMode = "gdb",
-    program = "/home/suryap/whisper/venv-whisper/bin/python3",
+    program = "/home/adl/SSP/venv-musicgen/bin/python3",
     cwd = "${workspaceFolder}",
-    args = {"/home/suryap/whisper/whisper-onnx/whisper-ort-inference.py", "--input", "/home/suryap/whisper/whisper-onnx/test.wav", "--model", "/home/suryap/whisper/whisper-onnx/whisper-model.onnx"},
-    -- env = {"LD_LIBRARY_PATH"="/home/suryap/onnxruntime/build_debug/Debug/"},
+    -- args = {"/home/adl/SSP/test.py"},
+    args = {"/home/adl/SSP/vision.py"},
     stopOnEntry = false,
     MIDebuggerPath = "gdb",
+    justMyCode = false,
     setupCommands= {
       {
         description= "Enable pretty-printing for gdb",
@@ -305,4 +320,9 @@ pcall(function() require("dap-python").setup(mason_path .. "packages/debugpy/ven
 -- neither are present it defaults to unittest.
 -- pcall(function() require("dap-python").test_runner = "pytest" end)
 
- 
+vim.diagnostic.config({virtual_text = false})
+
+-- dir.telescope settings
+require("telescope").load_extension("dir")
+vim.keymap.set("n", "<leader>fd", "<cmd>Telescope dir live_grep<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>pd", "<cmd>Telescope dir find_files<CR>", { noremap = true, silent = true })
