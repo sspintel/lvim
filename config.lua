@@ -263,7 +263,6 @@ lvim.builtin.dap.on_config_done = function(dap)
     type = 'executable',
     command = vim.fn.stdpath('data') .. '/mason/bin/OpenDebugAD7',
   }
-
   dap.configurations.cpp = {
   --   {
   --     name = "Debug C++ Program",
@@ -290,10 +289,9 @@ lvim.builtin.dap.on_config_done = function(dap)
     type = "cppdbg",
     request = "launch",
     MIMode = "gdb",
-    program = "/home/adl/SSP/venv-musicgen/bin/python3",
+    program = "/home/adl/SSP/venv-llama/bin/python3",
     cwd = "${workspaceFolder}",
-    -- args = {"/home/adl/SSP/test.py"},
-    args = {"/home/adl/SSP/vision.py"},
+    args = {"/home/adl/SSP/chatglm.py"},
     stopOnEntry = false,
     MIDebuggerPath = "gdb",
     justMyCode = false,
@@ -309,11 +307,23 @@ lvim.builtin.dap.on_config_done = function(dap)
   dap.configurations.c = dap.configurations.cpp
 end
 
+require('dap-python').setup('/home/adl/SSP/venv-llama/bin/python')
+table.insert(require('dap').configurations.python, {
+    name = "Debug Python Program",
+    type = "python",
+    request = "launch",
+    cwd = "${workspaceFolder}",
+    program = "/home/adl/SSP/chatglm.py",
+    stopOnEntry = false,
+    justMyCode = false,
+})
+
 -- TODO: debugpy installed by default
 -- Setup dap for python
 lvim.builtin.dap.active = true
 local mason_path = vim.fn.glob(vim.fn.stdpath "data" .. "/mason/")
 pcall(function() require("dap-python").setup(mason_path .. "packages/debugpy/venv/bin/python") end)
+require("dap-python").setup(mason_path .. "packages/debugpy/venv/bin/python")
 
 -- Supported test frameworks are unittest, pytest and django. By default it
 -- tries to detect the runner by probing for pytest.ini and manage.py, if
