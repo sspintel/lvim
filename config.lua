@@ -48,6 +48,11 @@ lvim.keys.normal_mode["<C-s>"] = ":w<cr>"
 -- lvim.builtin.theme.options.dim_inactive = true
 -- lvim.builtin.theme.options.style = "storm"
 
+lvim.builtin.which_key.mappings["S"] = {
+  name = "+Session",
+  s = { "<cmd>mksession! ~/.config/lvim/session/mysession.vim<CR>", "Save Session" },
+  l = { "<cmd>source ~/.config/lvim/session/mysession.vim<CR>", "Load Session" },
+}
 -- Use which-key to add extra bindings with the leader-key prefix
 -- lvim.builtin.which_key.mappings["P"] = { "<cmd>Telescope projects<CR>", "Projects" }
 -- lvim.builtin.which_key.mappings["t"] = {
@@ -164,54 +169,54 @@ lvim.builtin.treesitter.highlight.enable = true
 
 -- Additional Plugins
 lvim.plugins = {
-    -- {
-    --   "folke/trouble.nvim",
-    --   cmd = "TroubleToggle",
-    -- },
-    {
+  -- {
+  --   "folke/trouble.nvim",
+  --   cmd = "TroubleToggle",
+  -- },
+  {
     "f-person/git-blame.nvim",
     event = "BufRead",
     config = function()
       vim.cmd "highlight default link gitblame SpecialComment"
       vim.g.gitblame_enabled = 0
     end,
-    },
-    {
+  },
+  {
     "sindrets/diffview.nvim",
     event = "BufRead",
-    },
-    {
-      "folke/zen-mode.nvim",
-      config = function()
-        require("zen-mode").setup()
-      end
-    },
-    "mxsdev/nvim-dap-vscode-js",
-    {
-      "folke/trouble.nvim",
-      requires = "nvim-tree/nvim-web-devicons"
-    },
-    {
-      "simrat39/symbols-outline.nvim",
-      config = function()
-        require("symbols-outline").setup()
-      end
-    },
-    "mfussenegger/nvim-dap-python",
-    {
-      "princejoogie/dir-telescope.nvim",
-      -- telescope.nvim is a required dependency
-      requires = {"nvim-telescope/telescope.nvim"},
-      config = function()
-        require("dir-telescope").setup({
+  },
+  {
+    "folke/zen-mode.nvim",
+    config = function()
+      require("zen-mode").setup()
+    end
+  },
+  "mxsdev/nvim-dap-vscode-js",
+  {
+    "folke/trouble.nvim",
+    dependencies = "nvim-tree/nvim-web-devicons"
+  },
+  {
+    "simrat39/symbols-outline.nvim",
+    config = function()
+      require("symbols-outline").setup()
+    end
+  },
+  "mfussenegger/nvim-dap-python",
+  {
+    "princejoogie/dir-telescope.nvim",
+    -- telescope.nvim is a required dependency
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("dir-telescope").setup({
 
-          -- these are the default options set
-          hidden = true,
-          no_ignore = false,
-          show_preview = true,
-        })
-      end,
-    }
+        -- these are the default options set
+        hidden = true,
+        no_ignore = false,
+        show_preview = true,
+      })
+    end,
+  }
 }
 
 -- Autocommands (https://neovim.io/doc/user/autocmd.html)
@@ -238,16 +243,46 @@ vim.opt.sidescrolloff = 8
 vim.opt.ignorecase = true
 vim.opt.updatetime = 300
 
-lvim.builtin.telescope.defaults.layout_strategy ='horizontal'
+require("telescope").setup {
+  pickers = {
+    buffers = {
+      show_all_buffers = true,
+      sort_lastused = true,
+      theme = "dropdown",
+      previewer = false,
+      mappings = {
+        i = {
+          ["<c-d>"] = "delete_buffer",
+        }
+      }
+    }
+  }
+}
+
+lvim.builtin.telescope.defaults.layout_strategy = 'horizontal'
 lvim.builtin.telescope.pickers = {
   find_files = {
     layout_config = {
-        width = 0.90,
+      width = 0.95,
+      height = 0.80,
     },
   },
   live_grep = {
     layout_config = {
-      width = 0.90,
+      width = 0.95,
+      height = 0.80,
+    },
+  },
+  git_files = {
+    layout_config = {
+      width = 0.95,
+      height = 0.80,
+    },
+  },
+  grep_string = {
+    layout_config = {
+      width = 0.95,
+      height = 0.80,
     },
   },
 }
@@ -264,75 +299,123 @@ lvim.builtin.dap.on_config_done = function(dap)
     command = vim.fn.stdpath('data') .. '/mason/bin/OpenDebugAD7',
   }
   dap.configurations.cpp = {
-  --   {
-  --     name = "Debug C++ Program",
-  --     type = "cppdbg",
-  --     request = "launch",
-  --     MIMode = "gdb",
-  --     program = "/home/suryap/onnxruntime/build_debug/Debug/onnxruntime_perf_test",
-  --     cwd = "${workspaceFolder}",
-  --     args = {"-e", "openvino", "-i", "device_type|CPU_FP32 enable_dynamic_shapes|True", "/home/suryap/whisper/whisper-onnx/whisper-model.onnx", "-r", "10"},
-  --     -- env = {"LD_LIBRARY_PATH"="/home/suryap/onnxruntime/build_debug/Debug/"},
-  --     stopOnEntry = false,
-  --     MIDebuggerPath = "gdb",
-  --     setupCommands= {
-		-- 		{
-		-- 			description= "Enable pretty-printing for gdb",
-		-- 			text= "-enable-pretty-printing",
-		-- 			ignoreFailures= true,
-		-- 		}
-  --     },
-  --   },
-  -- },
-  {
-    name = "Debug Python C++ Program",
-    type = "cppdbg",
-    request = "launch",
-    MIMode = "gdb",
-    program = "/home/adl/SSP/venv-llama/bin/python3",
-    cwd = "${workspaceFolder}",
-    args = {"/home/adl/SSP/chatglm.py"},
-    stopOnEntry = false,
-    MIDebuggerPath = "gdb",
-    justMyCode = false,
-    setupCommands= {
       {
-        description= "Enable pretty-printing for gdb",
-        text= "-enable-pretty-printing",
-        ignoreFailures= true,
-      }
-    },
-  },
-}
+        name = "Debug Python C++ Program",
+        type = "cppdbg",
+        request = "launch",
+        MIMode = "gdb",
+        program = "/home/sshanmugam/venv/bin/python",
+        cwd = "${workspaceFolder}",
+        args = {"-m", "pytest", "/home/sshanmugam/qnpu/pt/src/pytorch-integration/tests/pytest_working/any_mode/test_ema.py", "-svk", "test_ema[precision1-2-0.5]", "--mode", "compile", "--dut", "gaudi2"},
+        env = {
+          PT_HPU_LAZY_MODE = "0",
+        },
+        stopOnEntry = false,
+        MIDebuggerPath = "gdb",
+        justMyCode = false,
+        setupCommands= {
+          {
+            description= "Enable pretty-printing for gdb",
+            text= "-enable-pretty-printing",
+            ignoreFailures= true,
+          }
+        },
+      },
+    -- {
+    --   name = "Debug C++ Program",
+    --   type = "cppdbg",
+    --   request = "launch",
+    --   MIMode = "gdb",
+    --   program =
+    --   "/home/ubuntu/SSP/onnxruntime.worktrees/master.worktrees/adrianl/openvino-remove-qdq/build_debug/Debug/onnxruntime_perf_test",
+    --   "/home/sshanmugam/venv/bin/python"
+    --   -- program = "/home/ubuntu/SSP/onnxruntime/build_cpu/Debug/onnxruntime_test_all",
+    --   -- program = "/home/ubuntu/openvino_cpp_samples_build/intel64/Debug/benchmark_app",
+    --   -- program = "/home/ubuntu/SSP/onnxruntime/build/Linux/Debug/onnxruntime_perf_test",
+    --   cwd = "${workspaceFolder}",
+    --   -- args = {"-e", "openvino", "-I", "-i", "device_type|CPU_FP32 ", "/home/ubuntu/SSP/onnxruntime.worktrees/master/OpenVINOExecutionProvider_OpenVINO-EP-subgraph_1_0-ov_blob.onnx", "-r", "1"},
+    --   args = { "-e", "openvino", "-I", "-r", "1", "-i", "device_type|CPU enable_qdq_optimizer|True disable_dynamic_shapes|True ", "-v", "/home/ubuntu/SSP/models/mobilenetv2-12-qdq/mobilenetv2-12-qdq.onnx" },
+    --   -- args = {"-m", "/home/ubuntu/SSP/whisper/whisper-tiny.en/decoder_model.onnx", "-hint", "latency", "-niter", "1", "-d", "CPU", "-infer_precision", "f16"},
+    --   -- args = {"--gtest_filter=Scatter.InvalidIndex"},
+    --   -- env = {"LD_LIBRARY_PATH"="/home/suryap/onnxruntime/build_debug/Debug/"},
+    --   stopOnEntry = false,
+    --   justMyCode = false,
+    --   MIDebuggerPath = "gdb",
+    --   setupCommands = {
+    --     {
+    --       description = "Enable pretty-printing for gdb",
+    --       text = "-enable-pretty-printing",
+    --       ignoreFailures = true,
+    --     }
+    --   },
+    -- },
+  }
   dap.configurations.c = dap.configurations.cpp
 end
 
-require('dap-python').setup('/home/adl/SSP/venv-llama/bin/python')
-table.insert(require('dap').configurations.python, {
-    name = "Debug Python Program",
-    type = "python",
-    request = "launch",
-    cwd = "${workspaceFolder}",
-    program = "/home/adl/SSP/chatglm.py",
-    stopOnEntry = false,
-    justMyCode = false,
-})
+-- require('dap-python').setup('/home/ubuntu/SSP/venv-llama/bin/python')
+-- table.insert(require('dap').configurations.python, {
+--     name = "Debug Python Program",
+--     type = "python",
+--     request = "launch",
+--     cwd = "${workspaceFolder}",
+--     program = "/home/ubuntu/SSP/chatglm.py",
+--     stopOnEntry = false,
+--     justMyCode = false,
+-- })
 
 -- TODO: debugpy installed by default
 -- Setup dap for python
-lvim.builtin.dap.active = true
-local mason_path = vim.fn.glob(vim.fn.stdpath "data" .. "/mason/")
-pcall(function() require("dap-python").setup(mason_path .. "packages/debugpy/venv/bin/python") end)
-require("dap-python").setup(mason_path .. "packages/debugpy/venv/bin/python")
+-- lvim.builtin.dap.active = true
+-- local mason_path = vim.fn.glob(vim.fn.stdpath "data" .. "/mason/")
+-- pcall(function() require("dap-python").setup(mason_path .. "packages/debugpy/venv/bin/python") end)
+-- require("dap-python").setup(mason_path .. "packages/debugpy/venv/bin/python")
 
 -- Supported test frameworks are unittest, pytest and django. By default it
 -- tries to detect the runner by probing for pytest.ini and manage.py, if
 -- neither are present it defaults to unittest.
 -- pcall(function() require("dap-python").test_runner = "pytest" end)
 
-vim.diagnostic.config({virtual_text = false})
+vim.diagnostic.config({ virtual_text = false })
+vim.diagnostic.config({ underline = false })
 
--- dir.telescope settings
-require("telescope").load_extension("dir")
-vim.keymap.set("n", "<leader>fd", "<cmd>Telescope dir live_grep<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<leader>pd", "<cmd>Telescope dir find_files<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>tt', ':call v:lua.toggle_diagnostics()<CR>',  {noremap = true, silent = true})
+
+-- Copilot plugins are defined below:
+lvim.plugins = {
+    {
+        "zbirenbaum/copilot.lua",
+        cmd = "Copilot",
+        event = "InsertEnter",
+        config = function()
+            require("copilot").setup({
+              suggestion = { enabled = false },
+              panel = { enabled = false }
+      })
+        end,
+    },
+
+    {
+        "zbirenbaum/copilot-cmp",
+        config = function()
+            require("copilot_cmp").setup({})
+        end
+    }
+}
+
+-- Below config is required to prevent copilot overriding Tab with a suggestion
+-- when you're just trying to indent!
+local has_words_before = function()
+    if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then return false end
+    local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+    return col ~= 0 and vim.api.nvim_buf_get_text(0, line-1, 0, line-1, col, {})[1]:match("^%s*$") == nil
+end
+local on_tab = vim.schedule_wrap(function(fallback)
+    local cmp = require("cmp")
+    if cmp.visible() and has_words_before() then
+        cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+    else
+        fallback()
+    end
+end)
+lvim.builtin.cmp.mapping["<Tab>"] = on_tab
