@@ -1,4 +1,4 @@
---[[
+--[[Fp8FusedSD
 lvim is the global options object
 
 Linters should be
@@ -167,57 +167,6 @@ lvim.builtin.treesitter.highlight.enable = true
 --   },
 -- }
 
--- Additional Plugins
-lvim.plugins = {
-  -- {
-  --   "folke/trouble.nvim",
-  --   cmd = "TroubleToggle",
-  -- },
-  {
-    "f-person/git-blame.nvim",
-    event = "BufRead",
-    config = function()
-      vim.cmd "highlight default link gitblame SpecialComment"
-      vim.g.gitblame_enabled = 0
-    end,
-  },
-  {
-    "sindrets/diffview.nvim",
-    event = "BufRead",
-  },
-  {
-    "folke/zen-mode.nvim",
-    config = function()
-      require("zen-mode").setup()
-    end
-  },
-  "mxsdev/nvim-dap-vscode-js",
-  {
-    "folke/trouble.nvim",
-    dependencies = "nvim-tree/nvim-web-devicons"
-  },
-  {
-    "simrat39/symbols-outline.nvim",
-    config = function()
-      require("symbols-outline").setup()
-    end
-  },
-  "mfussenegger/nvim-dap-python",
-  {
-    "princejoogie/dir-telescope.nvim",
-    -- telescope.nvim is a required dependency
-    dependencies = { "nvim-telescope/telescope.nvim" },
-    config = function()
-      require("dir-telescope").setup({
-
-        -- these are the default options set
-        hidden = true,
-        no_ignore = false,
-        show_preview = true,
-      })
-    end,
-  }
-}
 
 -- Autocommands (https://neovim.io/doc/user/autocmd.html)
 -- vim.api.nvim_create_autocmd("BufEnter", {
@@ -306,9 +255,12 @@ lvim.builtin.dap.on_config_done = function(dap)
         MIMode = "gdb",
         program = "/home/sshanmugam/venv/bin/python",
         cwd = "${workspaceFolder}",
-        args = {"-m", "pytest", "/home/sshanmugam/qnpu/pt/src/pytorch-integration/tests/pytest_working/any_mode/test_ema.py", "-svk", "test_ema[precision1-2-0.5]", "--mode", "compile", "--dut", "gaudi2"},
+        args = {"-m", "pytest", "/home/sshanmugam/qnpu/pt/src/pytorch-integration/tests/pytest_working/any_mode/fused_ops/test_sgd.py", "-svk", "test_sgd[0]", "--mode", "eager", "--dut", "gaudi2"},
         env = {
           PT_HPU_LAZY_MODE = "0",
+          LOG_LEVEL_ALL_PT = "1",
+          ENABLE_CONSOLE = "1",
+          LOG_LEVEL_ALL = "0",
         },
         stopOnEntry = false,
         MIDebuggerPath = "gdb",
@@ -376,31 +328,100 @@ end
 -- neither are present it defaults to unittest.
 -- pcall(function() require("dap-python").test_runner = "pytest" end)
 
-vim.diagnostic.config({ virtual_text = false })
-vim.diagnostic.config({ underline = false })
+-- vim.diagnostic.config({ virtual_text = false })
+-- vim.diagnostic.config({ underline = false })
 
-vim.api.nvim_set_keymap('n', '<leader>tt', ':call v:lua.toggle_diagnostics()<CR>',  {noremap = true, silent = true})
+-- vim.api.nvim_set_keymap('n', '<leader>tt', ':call v:lua.toggle_diagnostics()<CR>',  {noremap = true, silent = true})
 
--- Copilot plugins are defined below:
+
+-- Additional Plugins
 lvim.plugins = {
-    {
-        "zbirenbaum/copilot.lua",
-        cmd = "Copilot",
-        event = "InsertEnter",
-        config = function()
-            require("copilot").setup({
-              suggestion = { enabled = false },
-              panel = { enabled = false }
-      })
-        end,
-    },
+  -- {
+  --   "folke/trouble.nvim",
+  --   cmd = "TroubleToggle",
+  -- },
+  {
+    "f-person/git-blame.nvim",
+    event = "BufRead",
+    config = function()
+      vim.cmd "highlight default link gitblame SpecialComment"
+      vim.g.gitblame_enabled = 1
+      require("gitblame").setup { enabled = true }
+    end,
+  },
+  {
+    "sindrets/diffview.nvim",
+    event = "BufRead",
+  },
+  {
+    "folke/zen-mode.nvim",
+    cmd = "ZenMode",
+		event = "BufRead",
+		config = function()
+			require("zen-mode").setup({
+				window = {
+          width = 0.60,
+      }
+    })
+    end
+  },
+  "mxsdev/nvim-dap-vscode-js",
+  {
+    "folke/trouble.nvim",
+    dependencies = "nvim-tree/nvim-web-devicons"
+  },
+  {
+    "simrat39/symbols-outline.nvim",
+    config = function()
+      require("symbols-outline").setup()
+    end
+  },
+  "mfussenegger/nvim-dap-python",
+  {
+    "princejoogie/dir-telescope.nvim",
+    -- telescope.nvim is a required dependency
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("dir-telescope").setup({
 
-    {
-        "zbirenbaum/copilot-cmp",
-        config = function()
-            require("copilot_cmp").setup({})
-        end
-    }
+        -- these are the default options set
+        hidden = true,
+        no_ignore = false,
+        show_preview = true,
+      })
+    end,
+  },
+  {
+      "zbirenbaum/copilot.lua",
+      cmd = "Copilot",
+      event = "InsertEnter",
+      config = function()
+          require("copilot").setup({
+            suggestion = { enabled = false },
+            panel = { enabled = false }
+    })
+      end,
+  },
+  {
+      "zbirenbaum/copilot-cmp",
+      config = function()
+          require("copilot_cmp").setup({})
+      end
+  },
+  -- Or with configuration
+  {
+    'projekt0n/github-nvim-theme',
+    name = 'github-theme',
+    lazy = false, -- make sure we load this during startup if it is your main colorscheme
+    priority = 1000, -- make sure to load this before all the other start plugins
+    config = function()
+      require('github-theme').setup({
+        -- ...
+      })
+
+      vim.cmd('colorscheme github_dark')
+    end,
+  }
 }
 
 -- Below config is required to prevent copilot overriding Tab with a suggestion
@@ -419,3 +440,44 @@ local on_tab = vim.schedule_wrap(function(fallback)
     end
 end)
 lvim.builtin.cmp.mapping["<Tab>"] = on_tab
+
+---jump to the window of specified dapui element
+---@param element string filetype of the element or 'code_win' for the code window
+local jump_to_element = function(element)
+  local visible_wins = vim.api.nvim_tabpage_list_wins(0)
+  local dap_configurations = require('dap').configurations
+  for _, win in ipairs(visible_wins) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    if vim.bo[buf].filetype == element
+	  -- As we do not know the filetype of the code window, we have to check if
+	  -- we can find a window with a file type that is also in the dap.configurations
+	  -- We simply assume, that this is the code window
+	  or element == "code_win" and dap_configurations[vim.bo[buf].filetype] ~= nil
+    then
+      vim.api.nvim_set_current_win(win)
+      return
+    end
+  end
+  vim.notify(("element '%s' not found"):format(element), vim.log.levels.WARN)
+end
+
+local switch_dap_window_keymap = function(mapping, type_name)
+    vim.keymap.set(
+      "n",
+      mapping,
+      function()
+          jump_to_element(type_name)
+      end
+        )
+end
+
+switch_dap_window_keymap("<leader>dV", "dapui_scopes")
+switch_dap_window_keymap("<leader>dW", "dapui_watches")
+switch_dap_window_keymap("<leader>dB", "dapui_breakpoints")
+switch_dap_window_keymap("<leader>dS", "dapui_stacks")
+switch_dap_window_keymap("<leader>dL", "dapui_console")
+switch_dap_window_keymap("<leader>dE", "code_win")
+
+lvim.builtin.which_key.mappings["z"] = { "<cmd>ZenMode<CR>", "Zen Mode" }
+
+-- https://github.com/LunarVim/LunarVimCommunity/issues/2
